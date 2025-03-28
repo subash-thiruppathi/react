@@ -1,31 +1,36 @@
 pipeline {
-    agent any  // Runs on any available Jenkins agent
+    agent any
 
     stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/subash-thiruppathi/react.git'  // Replace with your repo
-            }
-        }
-
         stage('Build') {
             steps {
-                sh 'echo "Building project..."'
-                sh 'sleep 2'  // Simulate build process
+                echo 'Building project...'
+                sleep 2
             }
         }
-
         stage('Test') {
             steps {
-                sh 'echo "Running tests..."'
-                sh 'sleep 2'  // Simulate test process
+                echo 'Running tests...'
+                sleep 2
             }
         }
-
         stage('Deploy') {
             steps {
-                sh 'echo "Deployment successful!"'
+                echo 'Deployment successful!'
             }
+        }
+    }
+
+    post {
+        success {
+            emailext subject: "Jenkins Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: "Good news! The build ${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully.\nCheck: ${env.BUILD_URL}",
+                     recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+        }
+        failure {
+            emailext subject: "Jenkins Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: "Oops! The build ${env.JOB_NAME} #${env.BUILD_NUMBER} failed.\nCheck logs: ${env.BUILD_URL}",
+                     recipientProviders: [[$class: 'DevelopersRecipientProvider']]
         }
     }
 }
